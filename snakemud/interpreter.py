@@ -77,7 +77,7 @@ class Interpreter(object):
     x, y = random.choice(map.start_pos)
     seen = None
     tail = ()
-    length = 5
+    length = 7
 
     @property
     def command_list(self):
@@ -225,7 +225,11 @@ class Interpreter(object):
         elif what == '#':
             return "There's a wall blocking your way."
         elif what == '*':
-            return "Your body blocks the way."
+            if (self.x + dx, self.y + dy) == self.tail[0]:
+                return "You found your tail!"
+                # do something victory-like
+            else:
+                return "Your body blocks the way."
         else:
             return "You can't go there!"
 
@@ -260,6 +264,7 @@ class Interpreter(object):
         self.seen = None
         self.x, self.y = random.choice(self.map.start_pos)
         self.mark_seen(self.x, self.y)
+        self.do_explore(self.length)
         return '\n\n\n\n\n' + self.greeting
 
     def mark_seen(self, x, y):
