@@ -191,6 +191,17 @@ class Interpreter(object):
     def do_gps(self, *args):
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
+    def do_compass(self, *args):
+        compass = [
+            "   ___   ",
+            " .  N  . ",
+            ":   |   :",
+            ":W  *  E:",
+            ":       :",
+            " ' _S_ ' ",
+        ]
+        return '\n'.join(compass)
+
     def do_restart(self, *args):
         """start the game from the very beginning"""
         self.last_event = None
