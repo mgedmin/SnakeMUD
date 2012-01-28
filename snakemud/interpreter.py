@@ -43,6 +43,13 @@ class Interpreter(object):
             ) for command in self.command_list
         ])
 
+    counter = 0
+
+    def do_count(self, *args):
+        """count from one to infinity"""
+        self.counter += 1
+        return 'The count is now %d' % self.counter
+
 
 def main():
     interpreter = Interpreter()
