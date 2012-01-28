@@ -1256,7 +1256,7 @@ function get_stack(caller) {
                 } else {
                     return true;
                 }
-                return false;
+                return true;
             } /*else {
                 if ((e.altKey && e.which == 68) || 
                     (e.ctrlKey && [65, 66, 68, 69, 80, 78, 70].has(e.which)) ||
