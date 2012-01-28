@@ -47,6 +47,7 @@ class Interpreter(object):
     last_event = None
 
     x = y = 1
+    seen = None
 
     @property
     def command_list(self):
@@ -145,9 +146,10 @@ class Interpreter(object):
         except KeyError:
             return "I don't know where %s is." % direction
         what = self.map[self.x + dx, self.y + dy]
-        if what == ' ':
+        if what == '.':
             self.x += dx
             self.y += dy
+            self.mark_seen(self.x, self.y)
             exits = self.describe_exits()
             if not exits:
                 exits = "You somehow ended up in a room with no exits!?!?!"
@@ -163,7 +165,7 @@ class Interpreter(object):
         except KeyError:
             return False
         what = self.map[self.x + dx, self.y + dy]
-        return (what == ' ')
+        return (what == '.')
 
     def do_where(self, *args):
         """determine your current position"""
@@ -180,7 +182,31 @@ class Interpreter(object):
         self.y = 1
         self.counter = 0
         self.last_event = None
+        self.seen = None
+        self.mark_seen(self.x, self.y)
         return '\n\n\n\n\n' + self.greeting
+
+    def mark_seen(self, x, y):
+        if self.seen is None:
+            self.seen = set()
+        for ax in range(x-1, x+2):
+            for ay in range(y-1, y+2):
+                self.seen.add((ax, ay))
+
+    def do_map(self, *args):
+        if not self.seen:
+            return "Your map is blank.  You'll have to do some exploring first."
+        xs = [x for (x, y) in self.seen]
+        ys = [y for (x, y) in self.seen]
+        xmin, xmax = min(xs), max(xs)
+        ymin, ymax = min(ys), max(ys)
+        rows = []
+        for y in range(ymin, ymax + 1):
+            row = ['@' if (x, y) == (self.x, self.y) else
+                   self.map[x, y] if (x, y) in self.seen else ' '
+                   for x in range(xmin, xmax + 1)]
+            rows.append(' '.join(row))
+        return 'You remember your path:\n' + '\n'.join(rows)
 
 
 def main():
