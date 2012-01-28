@@ -261,6 +261,77 @@ class Interpreter(object):
         else:
             return '\n'.join(res)
 
+    def do_draw(self, *args):
+        room = [
+            ' ______________ ',
+            '|\            /|',
+            '| \ ________ / |',
+            '|  |        |  |',
+            '|  |        |  |',
+            '|  |        |  |',
+            '|  |________|  |',
+            '| /          \ |',
+            '|/____________\|',
+        ]
+        north_exit = [
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '     .----.     ',
+            '     |    |     ',
+            '     |____|     ',
+            '                ',
+            '                ',
+        ]
+        east_exit = [
+            '                ',
+            '                ',
+            '                ',
+            '              . ',
+            '             /| ',
+            '             || ',
+            '             || ',
+            '             \| ',
+            '              \ ',
+        ]
+        west_exit = [
+            '                ',
+            '                ',
+            '                ',
+            ' .              ',
+            ' |\             ',
+            ' ||             ',
+            ' ||             ',
+            ' |/             ',
+            ' /              ',
+        ]
+        south_exit = [
+            '                ',
+            '   _--------_   ',
+            '  /          \  ',
+            ' |            | ',
+            ' |            | ',
+            ' |            | ',
+            ' |            | ',
+            ' |            | ',
+            ' |____________| ',
+        ]
+        def overlay_image(back, front):
+            return [''.join(fc if fc != ' ' else bc
+                            for fc, bc in zip(frow, brow))
+                    for frow, brow in zip(front, back)]
+        if self.can_go('n'):
+            room = overlay_image(room, north_exit)
+        if self.can_go('e'):
+            room = overlay_image(room, east_exit)
+        if self.can_go('w'):
+            room = overlay_image(room, west_exit)
+        if self.can_go('s'):
+            room = overlay_image(room, south_exit)
+        return '\n'.join(room)
+
+
 
 def main():
     interpreter = Interpreter()
