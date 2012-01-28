@@ -1,5 +1,6 @@
 import time
 import pkg_resources
+import re
 import random
 from functools import partial
 
@@ -8,6 +9,9 @@ HEAD = '@'
 BODY = '*'
 TAIL = '*'
 WALL = '#'
+
+
+strip_escapes = partial(re.sub, r'\[\[[^]]*]([^]]*)]', r'\1')
 
 
 class Map(object):
@@ -148,7 +152,7 @@ class Interpreter(object):
                     description += '\n\nYour body fills the cavern to the %s.' % self.full_direction[d]
                 else:
                     description += '\n\nYou see a snake body in the %s.' % self.full_direction[d]
-        return description
+        return description + self.auto_things()
 
     def describe_exits(self, original_direction=None):
         exit_color = '#66f'
@@ -275,11 +279,7 @@ class Interpreter(object):
             msg = self.describe_exits(direction)
             if not msg:
                 msg = "You somehow ended up in a room with no exits!?!?!"
-            if self.auto_map:
-                msg += '\n\n' + self.do_map()
-            if self.auto_draw:
-                msg += '\n\n' + self.do_draw()
-            return msg
+            return msg + self.auto_things()
         elif what == WALL:
             return "There's a wall blocking your way."
         elif what == TAIL and self.coords(direction) == self.tail[0]:
@@ -352,11 +352,7 @@ class Interpreter(object):
         self.mark_seen(self.x, self.y)
         self.do_explore(self.length)
         msg = '\n\n\n\n\n' + self.greeting
-        if self.auto_map:
-            msg += '\n\n' + self.do_map()
-        if self.auto_draw:
-            msg += '\n\n' + self.do_draw()
-        return msg
+        return msg + self.auto_things()
 
     def mark_seen(self, x, y):
         if self.seen is None:
@@ -517,11 +513,36 @@ class Interpreter(object):
             room = overlay_image(room, south_exit)
         return '\n'.join(room)
 
+    def side_by_side(self, left, right, padding=4):
+        if not left:
+            return right
+        if not isinstance(left, list):
+            left = left.splitlines()
+        if not isinstance(right, list):
+            right = right.splitlines()
+        lwidth = max(len(strip_escapes(l)) for l in left) + padding
+        while len(left) < len(right):
+            left.append('')
+        while len(left) > len(right):
+            right.append('')
+        return '\n'.join(
+            (l + ' ' * (lwidth - len(strip_escapes(l))) + r).rstrip()
+            for l, r in zip(left, right))
+
+    def auto_things(self):
+        msg = ''
+        if self.auto_map and self.auto_draw:
+            msg += '\n\n' + self.side_by_side(self.do_draw(),
+                                              '\n' + self.do_map())
+        elif self.auto_map:
+            msg += '\n\n' + self.do_map()
+        elif self.auto_draw:
+            msg += '\n\n' + self.do_draw()
+        return msg
 
 
 def main():
-    import readline, re
-    strip_escapes = partial(re.sub, r'\[\[[^]]*]([^]]*)]', r'\1')
+    import readline
     interpreter = Interpreter()
     interpreter.do_quit = lambda: 'Bye!'
     interpreter.do_quit.__doc__ = 'exit'
