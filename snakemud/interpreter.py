@@ -140,9 +140,11 @@ class Interpreter(object):
         ])
 
     def do_eat(self, *args):
+        """eat something"""
         return "You don't have any food!"
 
     def do_bite(self, *args):
+        """bite something"""
         return "Bite what?"
 
     def do_go(self, direction, *args):
@@ -175,15 +177,8 @@ class Interpreter(object):
         what = self.map[self.x + dx, self.y + dy]
         return (what == '.')
 
-    def do_where(self, *args):
-        """determine your current position"""
-        return "Your GPS reads: %+d, %+d" % (self.x, self.y)
-
     def do_gps(self, *args):
-        return '\n'.join([
-            "Your GPS reads: %+d, %+d" % (self.x, self.y),
-            "Yeah, I don't know where a snake found a GPS.",
-        ])
+        return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
     def do_restart(self, *args):
         """start the game from the very beginning"""
