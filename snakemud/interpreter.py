@@ -211,6 +211,15 @@ class Interpreter(object):
             rows.append(' '.join(row))
         return 'You remember your path:\n' + '\n'.join(rows)
 
+    def do_undocumented(self, *args):
+        return "\n".join([
+            "Undocumented commands:",
+        ] + ['    ' + name[3:]
+             for name in sorted(dir(self))
+             if name.startswith('do_') and not getattr(self, name).__doc__
+        ])
+
+
 
 def main():
     interpreter = Interpreter()
