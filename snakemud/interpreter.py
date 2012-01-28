@@ -85,7 +85,7 @@ class Interpreter(object):
     x, y = random.choice(map.start_pos)
     seen = None
     tail = ()
-    length = 12
+    length = 11
 
     def __init__(self):
         self.do_restart()
