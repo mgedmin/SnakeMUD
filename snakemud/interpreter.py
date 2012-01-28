@@ -232,17 +232,19 @@ class Interpreter(object):
         what = args[0]
         if what in ('compass', 'map', 'gps'):
             return "It is inedible and not threatening."
-        if what in ('tail', 'body', 'snake'):
-            for d in 'nsew':
-                if self.look(d) == TAIL and self.coords(d) == self.tail[0]:
-                    return 'Ouch!  You found your tail!'
+        if what in ('tail', 'snake'):
+            if self.adjacent_to(self.tail[0]):
+                return 'Ouch!  You found your tail!'
         if what in ('body', 'snake'):
             for d in 'nsew':
-                if self.look(d) == BODY:
-                    if self.coords(d) in self.tail:
-                        return 'Ouch!'
-                    else:
-                        return 'You bite some snake.'
+                if self.look(d) == BODY and self.coords(d) not in self.tail:
+                    return 'You bite some snake.'
+            for d in 'nsew':
+                if self.coords(d) in self.tail:
+                    return 'Ouch!'
+        if what == ('tail', 'snake'):
+            if self.can_see(TAIL):
+                return 'You bite some snake.'
         return 'I see no %s here.' % what
 
     def do_go(self, *args):
