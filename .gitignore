@@ -4,3 +4,4 @@ local
 include
 SnakeMUD.egg-info
 *.pyc
+data

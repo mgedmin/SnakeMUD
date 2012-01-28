@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<%! from json import dumps as js %>
+## quick-and-dirty JavaScript escape function; not 100% safe (e.g. doesn't escape '</script>')
+## XXX the Markup() thing doesn't work! why?
+<%! import json; from markupsafe import Markup; js = lambda x: Markup(json.dumps(x)) %>\
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -19,7 +21,7 @@
             greetings: ${greeting|js} + '\n\n',
             tabcompletion: true,
             exit: false,
-            command_list: ${command_list|js},
+            command_list: ${command_list|js,n},
             prompt: '>'});
     });
   </script>

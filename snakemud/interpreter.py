@@ -21,6 +21,11 @@ class Interpreter(object):
     def unknown_command(self, command, *args):
         return ("Don't know how to %s, sorry." % command)
 
+    def do_clear(self, *args):
+        # handled by the terminal on the client-side; here just to
+        # show up in tab-completion list
+        return ''
+
     def do_look(self, *args):
         return ("You're slithering on the cold hard stone floor.\n"
                 "The cold doesn't bother you.")
