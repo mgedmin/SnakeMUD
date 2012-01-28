@@ -29,7 +29,7 @@ class Interpreter(object):
 
     map = Map()
 
-    greeting = "You are hungry."
+    greeting = "You are hungry.  Type 'help' if you feel lost."
 
     aliases = {
         'n': 'go north',
@@ -84,8 +84,9 @@ class Interpreter(object):
                 if (self.last_command is not None
                     and self.last_command > self.last_event):
                     msg = 'You sense the passage of time.'
-                else:
-                    msg = '' # let's not spam too much
+                else: # let's not spam too much
+                    self.last_event = self.last_command
+                    msg = ''
                 self.last_event = time.time()
                 return msg
         finally:
@@ -165,8 +166,11 @@ class Interpreter(object):
         """bite something"""
         return "Bite what?"
 
-    def do_go(self, direction, *args):
+    def do_go(self, *args):
         """move in the given direction (n/s/e/w)"""
+        if not args:
+            return 'Go where?  (Try north/south/east/west)'
+        direction = args[0]
         try:
             dx, dy = self.directions[direction.lower()]
         except KeyError:
