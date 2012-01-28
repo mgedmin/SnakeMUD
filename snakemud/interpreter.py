@@ -66,6 +66,7 @@ class Interpreter(object):
 
     last_event = None
     last_command = None
+    activity = True
 
     x, y = random.choice(map.start_pos)
     seen = None
@@ -80,10 +81,13 @@ class Interpreter(object):
             self.last_event = time.time()
         elif time.time() - self.last_event > 60:
             self.last_event = time.time()
-            return 'You sense the passage of time.'
+            if self.activity:
+                self.activity = False
+                return 'You sense the passage of time.'
 
     def interpret(self, command):
         self.last_event = time.time()
+        self.activity = True
         words = command.split()
         if not words:
             return "Huh?"
