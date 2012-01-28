@@ -126,6 +126,12 @@ class Interpreter(object):
         exits = self.describe_exits()
         if exits:
             description += '\n\n' + exits
+        for d in 'nsew':
+            if self.look(d) == '*':
+                if self.coords(d) == self.tail[0]:
+                    description += '\n\nYou see a snake tail in the %s!  Is that your tail?' % self.full_direction[d]
+                else:
+                    description += '\n\nYou see a snake body in the %s.' % self.full_direction[d]
         return description
 
     def describe_exits(self, original_direction=None):
@@ -237,16 +243,19 @@ class Interpreter(object):
         else:
             return "You can't go there!"
 
+    def coords(self, direction):
+        dx, dy = self.directions[direction.lower()]
+        return (self.x + dx, self.y + dy)
+
     def look(self, direction):
-        try:
-            dx, dy = self.directions[direction.lower()]
-        except KeyError:
-            return False
-        what = self.map[self.x + dx, self.y + dy]
+        what = self.map[self.coords(direction)]
         return what
 
     def can_go(self, direction):
-        return (self.look(direction) == '.')
+        try:
+            return (self.look(direction) == '.')
+        except KeyError:
+            return False
 
     def do_gps(self, *args):
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
