@@ -23,7 +23,10 @@ class Interpreter(object):
 def main():
     interpreter = Interpreter()
     while True:
-        command = raw_input("> ")
+        try:
+            command = raw_input("> ")
+        except EOFError:
+            break
         if command == 'quit':
             break
         print interpreter.interpret(command)
