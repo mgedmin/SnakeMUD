@@ -10,7 +10,7 @@
   <script src="${request.application_url}/static/js/jquery.terminal-0.4.6.js"></script>
   <script>
     jQuery(function($, undefined) {
-        $('#terminal').terminal(function(command, term) {
+        var term = $('#terminal').terminal(function(command, term) {
             $.post(${request.route_url("api_command")|js,n}, {c: command}, function(data){
                 term.echo(data.response);
                 term.echo('\n');
@@ -22,6 +22,17 @@
             exit: false,
             command_list: ${command_list|js,n},
             prompt: '>'});
+        var event_poll = function() {
+            $.getJSON(${request.route_url("api_events")|js,n}, function(data){
+                if (data.response) {
+                    term.echo(data.response);
+                    term.echo('\n');
+                }
+                term.set_command_list(data.command_list);
+                window.setTimeout(event_poll, 1000);
+            });
+        };
+        window.setTimeout(event_poll, 1000);
     });
   </script>
 </head>

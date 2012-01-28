@@ -10,5 +10,6 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
     config.add_route('api_command', '/command')
+    config.add_route('api_events', '/events')
     config.scan()
     return config.make_wsgi_app()

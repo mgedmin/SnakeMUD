@@ -1,7 +1,9 @@
+import time
 from functools import partial
 
 
 class Interpreter(object):
+    """Stateful command interpeter for a single player."""
 
     greeting = "You are hungry."
 
@@ -31,6 +33,19 @@ class Interpreter(object):
     def command_list(self):
         return sorted(name[3:] for name in dir(self) if name.startswith('do_')
                       and getattr(self, name).__doc__)
+
+    last_poll = None
+    last_event = None
+
+    def events(self):
+        try:
+            if self.last_event is None:
+                self.last_event = time.time()
+            if time.time() - self.last_event > 10:
+                self.last_event = time.time()
+                return 'You sense the passage of time.'
+        finally:
+            self.last_poll = time.time()
 
     def interpret(self, command):
         words = command.split()
