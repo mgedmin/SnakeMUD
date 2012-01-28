@@ -86,8 +86,25 @@ class Interpreter(object):
 
     def do_look(self, *args):
         """examine your surroundings"""
-        return ("You're slithering on the cold hard stone floor.\n"
-                "The cold doesn't bother you.")
+        description = ("You're slithering on the cold hard stone floor.\n"
+                       "The cold doesn't bother you.")
+        exits = self.describe_exits()
+        if exits:
+            description += '\n\n' + exits
+        return description
+
+    def describe_exits(self):
+        exits = [direction for direction in ['north', 'south', 'east', 'west']
+                 if self.can_go(direction)]
+        if exits:
+            if len(exits) == 1:
+                exit_description = "There's an exit to the %s." % exits[0]
+            else:
+                exit_description = 'There are exits to %s and the %s.' % (
+                ', '.join('the %s' % d for d in exits[:-1]), exits[-1])
+            return exit_description
+        else:
+            return ''
 
     def do_inventory(self, *args):
         """examine your inventory"""
@@ -131,18 +148,32 @@ class Interpreter(object):
         if what == ' ':
             self.x += dx
             self.y += dy
-            return "Your GPS reads: %+d, %+d" % (self.x, self.y)
+            exits = self.describe_exits()
+            if not exits:
+                exits = "You somehow ended up in a room with no exits!?!?!"
+            return exits
         elif what == '#':
             return "There's a wall blocking your way."
         else:
             return "You can't go there!"
+
+    def can_go(self, direction):
+        try:
+            dx, dy = self.directions[direction.lower()]
+        except KeyError:
+            return False
+        what = self.map[self.x + dx, self.y + dy]
+        return (what == ' ')
 
     def do_where(self, *args):
         """determine your current position"""
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
     def do_gps(self, *args):
-        return "Yeah, I don't know where a snake found a GPS."
+        return '\n'.join([
+            "Your GPS reads: %+d, %+d" % (self.x, self.y),
+            "Yeah, I don't know where a snake found a GPS.",
+        ])
 
     def do_restart(self, *args):
         self.x = 1
