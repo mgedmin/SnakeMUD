@@ -16,8 +16,8 @@ strip_escapes = partial(re.sub, r'\[\[[^]]*]([^]]*)]', r'\1')
 
 class Map(object):
 
-    def __init__(self):
-        self.data = pkg_resources.resource_string('snakemud', 'map.txt').splitlines()
+    def __init__(self, level=1):
+        self.data = pkg_resources.resource_string('snakemud', 'maps/l%d.txt' % level).splitlines()
         self.start_pos = []
         for y in range(len(self.data)):
             self.data[y] = list(self.data[y])
@@ -41,7 +41,8 @@ class Map(object):
 class Interpreter(object):
     """Stateful command interpeter for a single player."""
 
-    map = Map()
+    level = 1
+    map = Map(level=level)
 
     greeting = "You are hungry.  Type 'help' if you feel lost."
 
@@ -343,7 +344,7 @@ class Interpreter(object):
 
     def do_restart(self, *args):
         """start the game from the very beginning"""
-        self.map = Map()
+        self.map = Map(level=self.level)
         self.last_event = None
         self.seen = None
         pos = list(self.map.start_pos)
