@@ -12,5 +12,5 @@ bin/pcreate bin/pserve: bin/pip
 bin/python bin/pip:
 	virtualenv --no-site-packages .
 
-lib/python*/site-packages/SnakeMUD.egg-link:
+lib/python*/site-packages/SnakeMUD.egg-link: bin/python setup.py
 	bin/python setup.py develop
