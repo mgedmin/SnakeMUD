@@ -9,7 +9,7 @@ class Map(object):
         self.data = pkg_resources.resource_string('snakemud', 'map.txt').splitlines()
 
     def __getitem__(self, (x, y)):
-        if not 0 <= y <= len(self.data) or not 0 <= x <= len(self.data[y]):
+        if not 0 <= y < len(self.data) or not 0 <= x < len(self.data[y]):
             return '#'
         return self.data[x][y]
 
@@ -94,22 +94,25 @@ class Interpreter(object):
             description += '\n\n' + exits
         return description
 
-    def describe_exits(self):
+    def describe_exits(self, original_direction=None):
+        exit_color = '#66f'
         exits = [direction for direction in ['north', 'south', 'east', 'west']
                  if self.can_go(direction)]
-        if exits:
-            if len(exits) == 1:
-                exit_description = "There's an exit to the %s." % exits[0]
-            else:
-                exit_description = 'There are exits to %s and the %s.' % (
-                ', '.join('the %s' % d for d in exits[:-1]), exits[-1])
-            return exit_description
-        else:
+        if not exits:
             return ''
+        elif len(exits) == 1:
+            return "There's an exit to the [[;%s;]%s]." % (
+                exit_color, exits[0])
+        else:
+            return ("There are exits to %s and the [[;%s;]%s]." % (
+                ', '.join('the [[;%s;]%s]' % (exit_color, d)
+                          for d in exits[:-1]),
+                exit_color, exits[-1]))
 
     def do_inventory(self, *args):
         """examine your inventory"""
-        return ("You're a snake!  You're carrying nothing.")
+        return ("You're a snake!  You're carrying nothing.\n"
+                "Except the GPS you, uh, found somewhere.  And a map.  And a pencil.")
 
     def do_take(self, *args):
         """pick something up"""
@@ -150,7 +153,7 @@ class Interpreter(object):
             self.x += dx
             self.y += dy
             self.mark_seen(self.x, self.y)
-            exits = self.describe_exits()
+            exits = self.describe_exits(direction)
             if not exits:
                 exits = "You somehow ended up in a room with no exits!?!?!"
             return exits
@@ -202,7 +205,7 @@ class Interpreter(object):
         ymin, ymax = min(ys), max(ys)
         rows = []
         for y in range(ymin, ymax + 1):
-            row = ['@' if (x, y) == (self.x, self.y) else
+            row = ['[[;#a84;]@]' if (x, y) == (self.x, self.y) else
                    self.map[x, y] if (x, y) in self.seen else ' '
                    for x in range(xmin, xmax + 1)]
             rows.append(' '.join(row))
