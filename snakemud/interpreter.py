@@ -53,6 +53,17 @@ class Interpreter(object):
         'west': (-1, 0),
     }
 
+    full_direction = {
+        'n': 'north',
+        's': 'south',
+        'e': 'east',
+        'w': 'west',
+        'north': 'north',
+        'south': 'south',
+        'east': 'east',
+        'west': 'west',
+    }
+
     last_poll = None
     last_event = None
 
@@ -218,6 +229,37 @@ class Interpreter(object):
              if name.startswith('do_') and not getattr(self, name).__doc__
         ])
 
+    def pick_direction(self):
+        for direction in 'nsew':
+            if self.can_go(direction):
+                dx, dy = self.directions[direction]
+                x = self.x + dx
+                y = self.y + dy
+                for ax in range(x-1, x+2):
+                    for ay in range(y-1, y+2):
+                        if (ax, ay) not in self.seen:
+                            return direction
+        return None
+
+    def do_explore(self, *args):
+        if args:
+            try:
+                n = int(args[0])
+            except ValueError:
+                return 'What?'
+        else:
+            n = 1
+        res = []
+        for i in range(n):
+            d = self.pick_direction()
+            if not d:
+                break
+            res.append('You go %s.  %s' % (self.full_direction[d],
+                                           self.do_go(d)))
+        if not res:
+            return 'I agree, you should do some exploring.'
+        else:
+            return '\n'.join(res)
 
 
 def main():
