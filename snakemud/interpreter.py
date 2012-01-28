@@ -81,6 +81,7 @@ class Interpreter(object):
     activity = True
 
     auto_map = False
+    auto_draw = False
 
     x, y = random.choice(map.start_pos)
     seen = None
@@ -276,6 +277,8 @@ class Interpreter(object):
                 msg = "You somehow ended up in a room with no exits!?!?!"
             if self.auto_map:
                 msg += '\n\n' + self.do_map()
+            if self.auto_draw:
+                msg += '\n\n' + self.do_draw()
             return msg
         elif what == WALL:
             return "There's a wall blocking your way."
@@ -351,6 +354,8 @@ class Interpreter(object):
         msg = '\n\n\n\n\n' + self.greeting
         if self.auto_map:
             msg += '\n\n' + self.do_map()
+        if self.auto_draw:
+            msg += '\n\n' + self.do_draw()
         return msg
 
     def mark_seen(self, x, y):
@@ -434,6 +439,15 @@ class Interpreter(object):
             return '\n'.join(res)
 
     def do_draw(self, *args):
+        if args:
+            if args[0] == 'on':
+                self.auto_draw = True
+                return 'Autodraw enabled.'
+            elif args[0] == 'off':
+                self.auto_draw = False
+                return 'Autodraw disabled.'
+            else:
+                return 'Map what?'
         room = [
             ' ______________ ',
             '|\            /|',
