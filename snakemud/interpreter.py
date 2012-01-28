@@ -3,26 +3,21 @@ import pkg_resources
 from functools import partial
 
 
-class Cell(object):
-
-    def __init__(self, content, exits):
-        self.content = content
-        self.exists = exits
-
-
 class Map(object):
 
     def __init__(self):
         self.data = pkg_resources.resource_string('snakemud', 'map.txt').splitlines()
 
-    def cell(self, x, y):
-        if self.data[x][y]:
-            pass
-        return Cell([], [])
+    def __getitem__(self, (x, y)):
+        if not 0 <= y <= len(self.data) or not 0 <= x <= len(self.data[y]):
+            return '#'
+        return self.data[x][y]
 
 
 class Interpreter(object):
     """Stateful command interpeter for a single player."""
+
+    map = Map()
 
     greeting = "You are hungry."
 
@@ -48,13 +43,15 @@ class Interpreter(object):
         'west': (-1, 0),
     }
 
+    last_poll = None
+    last_event = None
+
+    x = y = 1
+
     @property
     def command_list(self):
         return sorted(name[3:] for name in dir(self) if name.startswith('do_')
                       and getattr(self, name).__doc__)
-
-    last_poll = None
-    last_event = None
 
     def events(self):
         try:
@@ -124,17 +121,21 @@ class Interpreter(object):
     def do_bite(self, *args):
         return "Bite what?"
 
-    x = y = 1
-
     def do_go(self, direction, *args):
         """move in the given direction (n/s/e/w)"""
         try:
             dx, dy = self.directions[direction.lower()]
         except KeyError:
             return "I don't know where %s is." % direction
-        self.x += dx
-        self.y += dy
-        return "Your GPS reads: %+d, %+d" % (self.x, self.y)
+        what = self.map[self.x + dx, self.y + dy]
+        if what == ' ':
+            self.x += dx
+            self.y += dy
+            return "Your GPS reads: %+d, %+d" % (self.x, self.y)
+        elif what == '#':
+            return "There's a wall blocking your way."
+        else:
+            return "You can't go there!"
 
     def do_where(self, *args):
         """determine your current position"""
@@ -142,6 +143,13 @@ class Interpreter(object):
 
     def do_gps(self, *args):
         return "Yeah, I don't know where a snake found a GPS."
+
+    def do_restart(self, *args):
+        self.x = 1
+        self.y = 1
+        self.counter = 0
+        self.last_event = None
+        return '\n\n\n\n\n' + self.greeting
 
 
 def main():
