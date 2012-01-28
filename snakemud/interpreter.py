@@ -379,11 +379,13 @@ class Interpreter(object):
 
 def main():
     import readline, re
+    strip_escapes = partial(re.sub, r'\[\[[^]]*]([^]]*)]', r'\1')
     interpreter = Interpreter()
     interpreter.do_quit = lambda: 'Bye!'
     interpreter.do_quit.__doc__ = 'exit'
-    print interpreter.greeting
+    print strip_escapes(interpreter.greeting)
     while True:
+        print
         try:
             command = raw_input("> ")
         except EOFError:
@@ -394,7 +396,7 @@ def main():
         if output:
             output += '\n\n'
         output += interpreter.interpret(command)
-        print re.sub(r'\[\[[^]]*]([^]]*)]', r'\1', output)
+        print strip_escapes(output)
 
 
 if __name__ == '__main__':
