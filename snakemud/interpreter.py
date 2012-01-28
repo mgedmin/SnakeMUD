@@ -118,6 +118,7 @@ class Interpreter(object):
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
     def do_where(self, *args):
+        """determine your current position"""
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
     def do_gps(self, *args):
