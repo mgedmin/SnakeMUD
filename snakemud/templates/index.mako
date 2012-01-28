@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%! from json import dumps as js %>
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,23 +11,16 @@
   <script>
     jQuery(function($, undefined) {
         $('#terminal').terminal(function(command, term) {
-            if (command == 'help') {
-                term.echo("Commands");
-                term.echo("    help         -- print this help");
-                term.echo("    clear        -- clear the screen");
-                term.echo("    lotsofoutput -- print lots of output to test scrolling");
-            } else if (command == 'lotsofoutput') {
-                for (var i = 0; i < 100; i++) {
-                    term.echo("lots of output");
-                }
-            } else {
-                term.echo('Bad command or file name.');
-            }
+            $.post(${request.route_url("api_command")|js}, {c: command}, function(data){
+                term.echo(data.response);
+                term.echo('\n');
+            });
         }, {
-            greetings: "You feel hungry.",
+            greetings: ${greeting|js} + '\n\n',
             tabcompletion: true,
-            command_list: ['help', 'clear', 'lotsofoutput'],
-            prompt: 'C:\\>'});
+            exit: false,
+            command_list: ${command_list|js},
+            prompt: '>'});
     });
   </script>
 </head>

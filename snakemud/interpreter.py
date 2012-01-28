@@ -5,6 +5,10 @@ class Interpreter(object):
 
     greeting = "You feel hungry."
 
+    @property
+    def command_list(self):
+        return sorted(name[3:] for name in dir(self) if name.startswith('do_'))
+
     def interpret(self, command):
         words = command.split()
         if not words:
