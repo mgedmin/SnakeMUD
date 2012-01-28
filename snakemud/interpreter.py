@@ -325,6 +325,12 @@ class Interpreter(object):
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
     def do_compass(self, *args):
+        if args:
+            if args[0] == 'on':
+                return 'The compass always points north, which is up.'
+            if args[0] == 'of':
+                return 'The compass always points north, which is up.'
+            return 'Compass what?'
         compass = [
             "   ___   ",
             " .  N  . ",
