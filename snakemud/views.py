@@ -27,4 +27,3 @@ def command(request):
     request.session.save() # interpreter may have changed its state
     return {'response': response,
             'command_list': interpreter.command_list}
-

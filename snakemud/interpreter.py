@@ -4,6 +4,14 @@ from functools import partial
 class Interpreter(object):
 
     greeting = "You feel hungry."
+    aliases = {'n': 'go north',
+               's': 'go south',
+               'e': 'go east',
+               'w': 'go west',
+               'north': 'go north',
+               'west': 'go west',
+               'south': 'go south',
+               'east': 'go east'}
 
     @property
     def command_list(self):
@@ -15,6 +23,8 @@ class Interpreter(object):
         if not words:
             return "Huh?"
         command = words[0].lower()
+        if command in self.aliases:
+            command = self.aliases.get(command)
         fn = getattr(self, 'do_' + command,
                      partial(self.unknown_command, command))
         return fn(*words)
