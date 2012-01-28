@@ -241,6 +241,8 @@ class Interpreter(object):
         ])
 
     def pick_direction(self):
+        if not self.seen:
+            self.mark_seen(self.x, self.y)
         choices = []
         for direction in 'nsew':
             if self.can_go(direction):
@@ -349,6 +351,7 @@ class Interpreter(object):
 
 
 def main():
+    import readline, re
     interpreter = Interpreter()
     interpreter.do_quit = lambda: 'Bye!'
     interpreter.do_quit.__doc__ = 'exit'
@@ -360,7 +363,11 @@ def main():
             break
         if command == 'quit':
             break
-        print interpreter.interpret(command)
+        output = interpreter.events() or ''
+        if output:
+            output += '\n\n'
+        output += interpreter.interpret(command)
+        print re.sub(r'\[\[[^]]*]([^]]*)]', r'\1', output)
 
 
 if __name__ == '__main__':
