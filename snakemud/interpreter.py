@@ -150,6 +150,8 @@ class Interpreter(object):
             return "I don't know where %s is." % direction
         what = self.map[self.x + dx, self.y + dy]
         if what == '.':
+            if not self.seen:
+                self.mark_seen((self.x, self.y))
             self.x += dx
             self.y += dy
             self.mark_seen(self.x, self.y)
@@ -181,6 +183,7 @@ class Interpreter(object):
         ])
 
     def do_restart(self, *args):
+        """start the game from the very beginning"""
         self.x = 1
         self.y = 1
         self.counter = 0
@@ -198,7 +201,7 @@ class Interpreter(object):
 
     def do_map(self, *args):
         if not self.seen:
-            return "Your map is blank.  You'll have to do some exploring first."
+            self.mark_seen((self.x, self.y))
         xs = [x for (x, y) in self.seen]
         ys = [y for (x, y) in self.seen]
         xmin, xmax = min(xs), max(xs)
@@ -209,7 +212,7 @@ class Interpreter(object):
                    self.map[x, y] if (x, y) in self.seen else ' '
                    for x in range(xmin, xmax + 1)]
             rows.append(' '.join(row))
-        return 'You remember your path:\n' + '\n'.join(rows)
+        return '\n'.join(rows)
 
     def do_undocumented(self, *args):
         return "\n".join([
