@@ -50,6 +50,8 @@ class Interpreter(object):
         'west': 'go west',
         'south': 'go south',
         'east': 'go east',
+        'pick up': 'take',
+        'look at': 'examine',
     }
 
     directions = {
@@ -108,10 +110,15 @@ class Interpreter(object):
         words = command.split()
         if not words:
             return "Huh?"
-        command = words[0].lower()
+        command = ' '.join(words[:2]).lower()
         if command in self.aliases:
-            words[:1] = self.aliases.get(command).split()
+            words[:2] = self.aliases.get(command).split()
             command = words[0].lower()
+        else:
+            command = words[0].lower()
+            if command in self.aliases:
+                words[:1] = self.aliases.get(command).split()
+                command = words[0].lower()
         fn = getattr(self, 'do_' + command,
                      partial(self.unknown_command, command))
         return fn(*words[1:])
@@ -171,14 +178,25 @@ class Interpreter(object):
         if not args:
             return "Examine what?"
         what = args[0]
+        if what == 'the' and len(args) > 1:
+            what = args[1]
         if what == 'compass':
             return self.do_compass()
         elif what == 'map':
             return self.do_map()
         elif what == 'gps':
             return self.do_gps()
-        else:
-            return "I see no %s here." % what
+        elif what == 'gps':
+            return self.do_gps()
+        elif what == 'tail' and self.adjacent_to(self.tail[0]):
+            return "What a magnificent tail!  Your mouth waters."
+        elif what == 'snake' and self.can_see(BODY, TAIL):
+            return "It's a snake."
+        elif what == 'body' and self.can_see(BODY):
+            return "It's a snake."
+        elif what == 'tail' and self.can_see(TAIL):
+            return "It's a snake."
+        return "I see no %s here." % what
 
     def do_drop(self, *args):
         """drop an object"""
@@ -279,6 +297,18 @@ class Interpreter(object):
     def look(self, direction):
         what = self.map[self.coords(direction)]
         return what
+
+    def can_see(self, *what):
+        for d in 'nsew':
+            if self.look(d) in what:
+                return d
+        return False
+
+    def adjacent_to(self, (x, y)):
+        for d in 'nsew':
+            if self.coords(d) == (x, y):
+                return d
+        return False
 
     def can_go(self, direction):
         try:
