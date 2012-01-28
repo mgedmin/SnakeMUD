@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-## quick-and-dirty JavaScript escape function; not 100% safe (e.g. doesn't escape '</script>')
-## XXX the Markup() thing doesn't work! why?
-<%! import json; from markupsafe import Markup; js = lambda x: Markup(json.dumps(x)) %>\
+<%! from json import dumps as js %>\
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -13,12 +11,12 @@
   <script>
     jQuery(function($, undefined) {
         $('#terminal').terminal(function(command, term) {
-            $.post(${request.route_url("api_command")|js}, {c: command}, function(data){
+            $.post(${request.route_url("api_command")|js,n}, {c: command}, function(data){
                 term.echo(data.response);
                 term.echo('\n');
             });
         }, {
-            greetings: ${greeting|js} + '\n\n',
+            greetings: ${greeting|js,n} + '\n\n',
             tabcompletion: true,
             exit: false,
             command_list: ${command_list|js,n},
