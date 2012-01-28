@@ -1,5 +1,6 @@
 import time
 import pkg_resources
+import random
 from functools import partial
 
 
@@ -7,11 +8,20 @@ class Map(object):
 
     def __init__(self):
         self.data = pkg_resources.resource_string('snakemud', 'map.txt').splitlines()
+        self.start_pos = []
+        for y in range(len(self.data)):
+            self.data[y] = list(self.data[y])
+            for x in range(len(self.data[y])):
+                if self[x, y] == '@':
+                    self.start_pos.append((x, y))
+                    self.data[y][x] = '.'
+        if not self.start_pos:
+            self.start_pos.append((1, 1))
 
     def __getitem__(self, (x, y)):
         if not 0 <= y < len(self.data) or not 0 <= x < len(self.data[y]):
             return '#'
-        return self.data[x][y]
+        return self.data[y][x]
 
 
 class Interpreter(object):
@@ -46,7 +56,7 @@ class Interpreter(object):
     last_poll = None
     last_event = None
 
-    x = y = 1
+    x, y = random.choice(map.start_pos)
     seen = None
 
     @property
@@ -129,13 +139,6 @@ class Interpreter(object):
             ) for command in self.command_list
         ])
 
-    counter = 0
-
-    def do_count(self, *args):
-        """count from one to infinity"""
-        self.counter += 1
-        return 'The count is now %d' % self.counter
-
     def do_eat(self, *args):
         return "You don't have any food!"
 
@@ -184,11 +187,9 @@ class Interpreter(object):
 
     def do_restart(self, *args):
         """start the game from the very beginning"""
-        self.x = 1
-        self.y = 1
-        self.counter = 0
         self.last_event = None
         self.seen = None
+        self.x, self.y = random.choice(self.map.start_pos)
         self.mark_seen(self.x, self.y)
         return '\n\n\n\n\n' + self.greeting
 
