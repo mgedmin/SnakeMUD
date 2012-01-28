@@ -161,6 +161,18 @@ class Interpreter(object):
         else:
             return "I see no %s here." % what
 
+    def do_drop(self, *args):
+        """drop an object"""
+        if not args:
+            return "Drop what?"
+        what = args[0]
+        if what in ('compass', 'map', 'gps'):
+            return "I don't want to.  It might still be useful."
+        elif what == 'database':
+            return "Ha ha, Mr. Bobby Tables."
+        else:
+            return "I see no %s here." % what
+
     def do_help(self, *args):
         """print help about available commands"""
         return "\n".join([
