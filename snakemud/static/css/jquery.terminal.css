@@ -26,8 +26,8 @@
 .terminal, .terminal .terminal-output, .terminal .terminal-output div,
 .terminal .terminal-output div div, .cmd, .terminal .cmd span, .terminal .cmd div {
     font-family: monospace;
-    color: #aaa;
-    background-color: #000;
+    color: #444;
+    background-color: #fff;
     font-size: 12px;
 }
 /* This works only in Safari and Google Chrome */
@@ -36,34 +36,26 @@
     .terminal .terminal-output div div, .cmd, .terminal .cmd span, .terminal .cmd div {
         font-weight: bold;
     }
-}  
+}
 .terminal .cmd span {
     float: left;
 }
 .terminal .cmd span.inverted {
-    background-color: #aaa;
-    color: #000;
+    background-color: #444;
+    color: #aaa;
 }
-.terminal::-moz-selection {
-    background: rgba(170, 170, 170, 0.99);
-    color: #000;
-    text-shadow: none;
-}
-.terminal::-webkit-selection {
-    background: rgba(170, 170, 170, 0.99);
-    color: #000;
-    text-shadow: none;
-}
+.terminal::-moz-selection,
+.terminal::-webkit-selection,
 .terminal::selection {
     background: rgba(170, 170, 170, 0.99);
-    color: #000;
+    color: #fff;
     text-shadow: none;
 }
 /* chrome hack */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     ::selection {
         background: rgba(170, 170, 170, 0.99);
-        color: #000;
+        color: #fff;
         text-shadow: none;
     }
 }
@@ -79,4 +71,4 @@
 }
 .clear {
     clear: both;
-}  
+}
