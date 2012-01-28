@@ -167,7 +167,7 @@ class Interpreter(object):
         what = self.map[self.x + dx, self.y + dy]
         if what == '.':
             if not self.seen:
-                self.mark_seen((self.x, self.y))
+                self.mark_seen(self.x, self.y)
             self.x += dx
             self.y += dy
             self.mark_seen(self.x, self.y)
@@ -219,7 +219,7 @@ class Interpreter(object):
 
     def do_map(self, *args):
         if not self.seen:
-            self.mark_seen((self.x, self.y))
+            self.mark_seen(self.x, self.y)
         xs = [x for (x, y) in self.seen]
         ys = [y for (x, y) in self.seen]
         xmin, xmax = min(xs), max(xs)
