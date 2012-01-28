@@ -7,7 +7,8 @@ class Interpreter(object):
 
     @property
     def command_list(self):
-        return sorted(name[3:] for name in dir(self) if name.startswith('do_'))
+        return sorted(name[3:] for name in dir(self) if name.startswith('do_')
+                      and getattr(self, name).__doc__)
 
     def interpret(self, command):
         words = command.split()
@@ -35,6 +36,10 @@ class Interpreter(object):
     def do_inventory(self, *args):
         """examine your inventory"""
         return ("You're a snake!  You're carrying nothing.")
+
+    def do_take(self, *args):
+        """pick something up"""
+        return ("There's nothing here to take.")
 
     def do_help(self, *args):
         """print help about available commands"""

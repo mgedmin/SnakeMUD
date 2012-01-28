@@ -14,6 +14,7 @@
             $.post(${request.route_url("api_command")|js,n}, {c: command}, function(data){
                 term.echo(data.response);
                 term.echo('\n');
+                term.set_command_list(data.command_list);
             });
         }, {
             greetings: ${greeting|js,n} + '\n\n',

@@ -1910,6 +1910,12 @@ function get_stack(caller) {
             name: function() {
                 return settings.name;
             },
+            get_command_list: function(command_list) {
+                return interpreters.top().command_list;
+            },
+            set_command_list: function(command_list) {
+                interpreters.top().command_list = command_list;
+            },
             push: function(_eval, options) {
                 if (!options.prompt || valid('prompt', options.prompt)) {
                     if (typeof _eval == 'string') {

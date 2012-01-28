@@ -25,5 +25,6 @@ def command(request):
     command = request.params.get('c')
     response = interpreter.interpret(command)
     request.session.save() # interpreter may have changed its state
-    return {'response': response}
+    return {'response': response,
+            'command_list': interpreter.command_list}
 
