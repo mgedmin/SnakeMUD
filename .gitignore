@@ -5,3 +5,6 @@ include
 SnakeMUD.egg-info
 *.pyc
 data
+pyramid.log
+tags
+pyramid.log.*

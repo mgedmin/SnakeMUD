@@ -3,6 +3,14 @@ all: bin/pserve lib/python*/site-packages/SnakeMUD.egg-link
 run: bin/pserve lib/python*/site-packages/SnakeMUD.egg-link
 	bin/pserve development.ini --reload
 
+start: bin/pserve lib/python*/site-packages/SnakeMUD.egg-link
+	savelog pyramid.log
+	bin/pserve --daemon production.ini
+	sleep 0.5 && tail pyramid.log
+
+stop:
+	bin/pserve --stop-daemon
+
 clean:
 	find -name '*.pyc' -delete
 
