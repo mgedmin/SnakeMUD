@@ -3,6 +3,12 @@ import pkg_resources
 import random
 from functools import partial
 
+FLOOR = '.'
+HEAD = '@'
+BODY = '*'
+TAIL = '*'
+WALL = '#'
+
 
 class Map(object):
 
@@ -12,15 +18,15 @@ class Map(object):
         for y in range(len(self.data)):
             self.data[y] = list(self.data[y])
             for x in range(len(self.data[y])):
-                if self[x, y] == '@':
+                if self[x, y] == HEAD:
                     self.start_pos.append((x, y))
-                    self.data[y][x] = '.'
+                    self.data[y][x] = FLOOR
         if not self.start_pos:
             self.start_pos.append((1, 1))
 
     def __getitem__(self, (x, y)):
         if not 0 <= y < len(self.data) or not 0 <= x < len(self.data[y]):
-            return '#'
+            return WALL
         return self.data[y][x]
 
     def __setitem__(self, (x, y), c):
@@ -77,7 +83,7 @@ class Interpreter(object):
     x, y = random.choice(map.start_pos)
     seen = None
     tail = ()
-    length = 7
+    length = 12
 
     def __init__(self):
         self.do_restart()
@@ -127,9 +133,11 @@ class Interpreter(object):
         if exits:
             description += '\n\n' + exits
         for d in 'nsew':
-            if self.look(d) == '*':
+            if self.look(d) == BODY:
                 if self.coords(d) == self.tail[0]:
                     description += '\n\nYou see a snake tail in the %s!  Is that your tail?' % self.full_direction[d]
+                elif self.coords(d) == self.tail[-1]:
+                    description += '\n\nYour body fills the cavern to the %s.' % self.full_direction[d]
                 else:
                     description += '\n\nYou see a snake body in the %s.' % self.full_direction[d]
         return description
@@ -137,7 +145,7 @@ class Interpreter(object):
     def describe_exits(self, original_direction=None):
         exit_color = '#66f'
         exits = [direction for direction in ['north', 'south', 'east', 'west']
-                 if self.look(direction) in '.*']
+                 if self.look(direction) in (FLOOR, BODY, TAIL)]
         if not exits:
             return ''
         elif len(exits) == 1:
@@ -206,10 +214,17 @@ class Interpreter(object):
         what = args[0]
         if what in ('compass', 'map', 'gps'):
             return "It is inedible and not threatening."
-        if what == 'tail':
+        if what in ('tail', 'body', 'snake'):
             for d in 'nsew':
-                if self.look(d) == '*' and self.coords(d) == self.tail[0]:
+                if self.look(d) == TAIL and self.coords(d) == self.tail[0]:
                     return 'Ouch!  You found your tail!'
+        if what in ('body', 'snake'):
+            for d in 'nsew':
+                if self.look(d) == BODY:
+                    if self.coords(d) in self.tail:
+                        return 'Ouch!'
+                    else:
+                        return 'You bite some snake.'
         return 'I see no %s here.' % what
 
     def do_go(self, *args):
@@ -222,33 +237,38 @@ class Interpreter(object):
         except KeyError:
             return "I don't know where %s is." % direction
         what = self.map[self.x + dx, self.y + dy]
-        if what == '.':
+        if what == FLOOR:
             if not self.seen:
                 self.mark_seen(self.x, self.y)
             self.tail += ((self.x, self.y), )
-            self.map[self.x, self.y] = '*'
+            self.map[self.x, self.y] = BODY
             while len(self.tail) > self.length:
                 x, y = self.tail[0]
-                self.map[x, y] = '.'
+                self.map[x, y] = FLOOR
                 self.tail = self.tail[1:]
+            self.map[self.tail[0]] = TAIL
             self.x += dx
             self.y += dy
             self.mark_seen(self.x, self.y)
-            self.map[self.x, self.y] = '@'
+            self.map[self.x, self.y] = HEAD
             msg = self.describe_exits(direction)
             if not msg:
                 msg = "You somehow ended up in a room with no exits!?!?!"
             if self.auto_map:
                 msg += '\n' + self.do_map()
             return msg
-        elif what == '#':
+        elif what == WALL:
             return "There's a wall blocking your way."
-        elif what == '*':
-            if (self.x + dx, self.y + dy) == self.tail[0]:
-                return "You found your tail!"
-                # do something victory-like
-            else:
-                return "Your body blocks the way."
+        elif what == TAIL and self.coords(direction) == self.tail[0]:
+            return "You found your tail! Your mouth waters."
+            # gently suggest biting it
+        elif what == BODY and self.coords(direction) in self.tail:
+            return "Your body blocks the way."
+        elif what == BODY:
+            return "Some other snake's body blocks the way."
+        elif what == TAIL:
+            # never gonna happen if BODY == TAIL
+            return "Some other snake's tail blocks sthe way."
         else:
             return "You can't go there!"
 
@@ -262,7 +282,7 @@ class Interpreter(object):
 
     def can_go(self, direction):
         try:
-            return (self.look(direction) == '.')
+            return (self.look(direction) == FLOOR)
         except KeyError:
             return False
 
@@ -288,12 +308,12 @@ class Interpreter(object):
         pos = list(self.map.start_pos)
         random.shuffle(pos)
         for x, y in self.tail:
-            self.map[x, y] = '.'
+            self.map[x, y] = FLOOR
         self.tail = ()
         for self.x, self.y in pos:
-            if self.map[self.x, self.y] == '.':
+            if self.map[self.x, self.y] == FLOOR:
                 break
-        self.map[self.x, self.y] = '@'
+        self.map[self.x, self.y] = HEAD
         self.mark_seen(self.x, self.y)
         self.do_explore(self.length)
         return '\n\n\n\n\n' + self.greeting
@@ -438,13 +458,13 @@ class Interpreter(object):
             return [''.join(fc if fc != ' ' else bc
                             for fc, bc in zip(frow, brow))
                     for frow, brow in zip(front, back)]
-        if self.look('n') in '.*':
+        if self.look('n') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, north_exit)
-        if self.look('e') in '.*':
+        if self.look('e') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, east_exit)
-        if self.look('w') in '.*':
+        if self.look('w') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, west_exit)
-        if self.look('s') in '.*':
+        if self.look('s') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, south_exit)
         return '\n'.join(room)
 
