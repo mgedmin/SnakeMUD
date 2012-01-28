@@ -275,7 +275,7 @@ class Interpreter(object):
             if not msg:
                 msg = "You somehow ended up in a room with no exits!?!?!"
             if self.auto_map:
-                msg += '\n' + self.do_map()
+                msg += '\n\n' + self.do_map()
             return msg
         elif what == WALL:
             return "There's a wall blocking your way."
@@ -348,7 +348,10 @@ class Interpreter(object):
         self.map[self.x, self.y] = HEAD
         self.mark_seen(self.x, self.y)
         self.do_explore(self.length)
-        return '\n\n\n\n\n' + self.greeting
+        msg = '\n\n\n\n\n' + self.greeting
+        if self.auto_map:
+            msg += '\n\n' + self.do_map()
+        return msg
 
     def mark_seen(self, x, y):
         if self.seen is None:
