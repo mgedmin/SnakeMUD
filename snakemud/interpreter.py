@@ -1,5 +1,24 @@
 import time
+import pkg_resources
 from functools import partial
+
+
+class Cell(object):
+
+    def __init__(self, content, exits):
+        self.content = content
+        self.exists = exits
+
+
+class Map(object):
+
+    def __init__(self):
+        self.data = pkg_resources.resource_string('snakemud', 'map.txt').splitlines()
+
+    def cell(self, x, y):
+        if self.data[x][y]:
+            pass
+        return Cell([], [])
 
 
 class Interpreter(object):
@@ -105,7 +124,7 @@ class Interpreter(object):
     def do_bite(self, *args):
         return "Bite what?"
 
-    x = y = 0
+    x = y = 1
 
     def do_go(self, direction, *args):
         """move in the given direction (n/s/e/w)"""
