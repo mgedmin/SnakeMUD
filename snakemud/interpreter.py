@@ -216,6 +216,7 @@ class Interpreter(object):
             self.x += dx
             self.y += dy
             self.mark_seen(self.x, self.y)
+            self.map[self.x, self.y] = '@'
             msg = self.describe_exits(direction)
             if not msg:
                 msg = "You somehow ended up in a room with no exits!?!?!"
@@ -262,7 +263,15 @@ class Interpreter(object):
         """start the game from the very beginning"""
         self.last_event = None
         self.seen = None
-        self.x, self.y = random.choice(self.map.start_pos)
+        pos = list(self.map.start_pos)
+        random.shuffle(pos)
+        for x, y in self.tail:
+            self.map[x, y] = '.'
+        self.tail = ()
+        for self.x, self.y in pos:
+            if self.map[self.x, self.y] == '.':
+                break
+        self.map[self.x, self.y] = '@'
         self.mark_seen(self.x, self.y)
         self.do_explore(self.length)
         return '\n\n\n\n\n' + self.greeting
@@ -293,7 +302,7 @@ class Interpreter(object):
         rows = []
         for y in range(ymin, ymax + 1):
             row = ['[[;#a84;]@]' if (x, y) == (self.x, self.y)
-                   else '[[;#a84;]*]' if self.map[x, y] == '*'
+                   else '[[;#a84;]*]' if (x, y) in self.tail
                                          and (x, y) in self.seen
                    else self.map[x, y] if (x, y) in self.seen
                    else ' '
