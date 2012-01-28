@@ -1,4 +1,13 @@
+body {
+    background: #fff;
+    color: #000;
+}
+
 h1 {
+    margin: 10px;
+    padding: 0;
+    font-family: 'Comic Sans MS', sans-serif;
+    font-size: 32px;
     color: #aaa;
 }
 
