@@ -241,6 +241,7 @@ class Interpreter(object):
         ])
 
     def pick_direction(self):
+        choices = []
         for direction in 'nsew':
             if self.can_go(direction):
                 dx, dy = self.directions[direction]
@@ -249,8 +250,11 @@ class Interpreter(object):
                 for ax in range(x-1, x+2):
                     for ay in range(y-1, y+2):
                         if (ax, ay) not in self.seen:
-                            return direction
-        return None
+                            choices.append(direction)
+        if choices:
+            return random.choice(choices)
+        else:
+            return None
 
     def do_explore(self, *args):
         if args:
