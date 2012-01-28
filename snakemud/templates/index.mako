@@ -10,10 +10,22 @@
   <script>
     jQuery(function($, undefined) {
         $('#terminal').terminal(function(command, term) {
-            term.echo('Bad command or file name.');
+            if (command == 'help') {
+                term.echo("Commands");
+                term.echo("    help         -- print this help");
+                term.echo("    clear        -- clear the screen");
+                term.echo("    lotsofoutput -- print lots of output to test scrolling");
+            } else if (command == 'lotsofoutput') {
+                for (var i = 0; i < 100; i++) {
+                    term.echo("lots of output");
+                }
+            } else {
+                term.echo('Bad command or file name.');
+            }
         }, {
             greetings: "You feel hungry.",
-            height: 600,
+            tabcompletion: true,
+            command_list: ['help', 'clear', 'lotsofoutput'],
             prompt: 'C:\\>'});
     });
   </script>
