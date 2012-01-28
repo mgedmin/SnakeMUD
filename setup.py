@@ -36,6 +36,8 @@ setup(name='SnakeMUD',
       entry_points = """\
       [paste.app_factory]
       main = snakemud:main
+      [console_scripts]
+      snakemud = snakemud.interpreter:main
       """,
       )
 

@@ -46,6 +46,8 @@ class Interpreter(object):
 
 def main():
     interpreter = Interpreter()
+    interpreter.do_quit = lambda: 'Bye!'
+    interpreter.do_quit.__doc__ = 'exit'
     print interpreter.greeting
     while True:
         try:
