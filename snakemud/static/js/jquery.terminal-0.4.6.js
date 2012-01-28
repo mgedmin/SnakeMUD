@@ -2284,7 +2284,9 @@ function get_stack(caller) {
                 };
             })(init_eval);
         } else if (typeof init_eval == 'function') {
-            // skip
+            if (settings.command_list) {
+                command_list = settings.command_list;
+            }
         } else {
             throw 'Unknow object "' + String(init_eval) + '" passed as eval';
         }
