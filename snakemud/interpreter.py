@@ -3,6 +3,8 @@ from functools import partial
 
 class Interpreter(object):
 
+    greeting = "You feel hungry."
+
     def interpret(self, command):
         words = command.split()
         if not words:
@@ -22,6 +24,7 @@ class Interpreter(object):
 
 def main():
     interpreter = Interpreter()
+    print interpreter.greeting
     while True:
         try:
             command = raw_input("> ")
