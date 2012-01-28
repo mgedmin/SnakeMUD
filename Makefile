@@ -11,6 +11,14 @@ start: bin/pserve lib/python*/site-packages/SnakeMUD.egg-link
 stop:
 	bin/pserve --stop-daemon
 
+restart:
+	$(MAKE) stop || true
+	$(MAKE) start
+
+update:
+	git pull
+	make restart
+
 clean:
 	find -name '*.pyc' -delete
 
