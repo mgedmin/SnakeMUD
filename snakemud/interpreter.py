@@ -23,6 +23,10 @@ class Map(object):
             return '#'
         return self.data[y][x]
 
+    def __setitem__(self, (x, y), c):
+        assert 0 <= y < len(self.data) and 0 <= x < len(self.data[y])
+        self.data[y][x] = c
+
 
 class Interpreter(object):
     """Stateful command interpeter for a single player."""
@@ -68,8 +72,12 @@ class Interpreter(object):
     last_command = None
     activity = True
 
+    auto_map = False
+
     x, y = random.choice(map.start_pos)
     seen = None
+    tail = ()
+    length = 5
 
     @property
     def command_list(self):
@@ -120,7 +128,7 @@ class Interpreter(object):
     def describe_exits(self, original_direction=None):
         exit_color = '#66f'
         exits = [direction for direction in ['north', 'south', 'east', 'west']
-                 if self.can_go(direction)]
+                 if self.look(direction) in '.*']
         if not exits:
             return ''
         elif len(exits) == 1:
@@ -199,25 +207,38 @@ class Interpreter(object):
         if what == '.':
             if not self.seen:
                 self.mark_seen(self.x, self.y)
+            self.tail += ((self.x, self.y), )
+            self.map[self.x, self.y] = '*'
+            while len(self.tail) > self.length:
+                x, y = self.tail[0]
+                self.map[x, y] = '.'
+                self.tail = self.tail[1:]
             self.x += dx
             self.y += dy
             self.mark_seen(self.x, self.y)
-            exits = self.describe_exits(direction)
-            if not exits:
-                exits = "You somehow ended up in a room with no exits!?!?!"
-            return exits
+            msg = self.describe_exits(direction)
+            if not msg:
+                msg = "You somehow ended up in a room with no exits!?!?!"
+            if self.auto_map:
+                msg += '\n' + self.do_map()
+            return msg
         elif what == '#':
             return "There's a wall blocking your way."
+        elif what == '*':
+            return "Your body blocks the way."
         else:
             return "You can't go there!"
 
-    def can_go(self, direction):
+    def look(self, direction):
         try:
             dx, dy = self.directions[direction.lower()]
         except KeyError:
             return False
         what = self.map[self.x + dx, self.y + dy]
-        return (what == '.')
+        return what
+
+    def can_go(self, direction):
+        return (self.look(direction) == '.')
 
     def do_gps(self, *args):
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
@@ -251,14 +272,26 @@ class Interpreter(object):
     def do_map(self, *args):
         if not self.seen:
             self.mark_seen(self.x, self.y)
+        if args:
+            if args[0] == 'on':
+                self.auto_map = True
+                return 'Automap enabled.'
+            elif args[0] == 'off':
+                self.auto_map = False
+                return 'Automap disabled.'
+            else:
+                return 'Map what?'
         xs = [x for (x, y) in self.seen]
         ys = [y for (x, y) in self.seen]
         xmin, xmax = min(xs), max(xs)
         ymin, ymax = min(ys), max(ys)
         rows = []
         for y in range(ymin, ymax + 1):
-            row = ['[[;#a84;]@]' if (x, y) == (self.x, self.y) else
-                   self.map[x, y] if (x, y) in self.seen else ' '
+            row = ['[[;#a84;]@]' if (x, y) == (self.x, self.y)
+                   else '[[;#a84;]*]' if self.map[x, y] == '*'
+                                         and (x, y) in self.seen
+                   else self.map[x, y] if (x, y) in self.seen
+                   else ' '
                    for x in range(xmin, xmax + 1)]
             rows.append(' '.join(row))
         return '\n'.join(rows)
@@ -369,13 +402,13 @@ class Interpreter(object):
             return [''.join(fc if fc != ' ' else bc
                             for fc, bc in zip(frow, brow))
                     for frow, brow in zip(front, back)]
-        if self.can_go('n'):
+        if self.look('n') in '.*':
             room = overlay_image(room, north_exit)
-        if self.can_go('e'):
+        if self.look('e') in '.*':
             room = overlay_image(room, east_exit)
-        if self.can_go('w'):
+        if self.look('w') in '.*':
             room = overlay_image(room, west_exit)
-        if self.can_go('s'):
+        if self.look('s') in '.*':
             room = overlay_image(room, south_exit)
         return '\n'.join(room)
 
