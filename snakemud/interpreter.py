@@ -14,7 +14,7 @@ class Interpreter(object):
         if not words:
             return "Huh?"
         command = words[0].lower()
-        fn = getattr(self, 'do_%s' % command,
+        fn = getattr(self, 'do_' + command,
                      partial(self.unknown_command, command))
         return fn(*words)
 
@@ -22,13 +22,26 @@ class Interpreter(object):
         return ("Don't know how to %s, sorry." % command)
 
     def do_clear(self, *args):
+        """clear the screen"""
         # handled by the terminal on the client-side; here just to
         # show up in tab-completion list
         return ''
 
     def do_look(self, *args):
+        """examine your surroundings"""
         return ("You're slithering on the cold hard stone floor.\n"
                 "The cold doesn't bother you.")
+
+    def do_help(self, *args):
+        """print help about available commands"""
+        return "\n".join([
+            "Commands:",
+        ] + [
+            '    %(command)-10s -- %(help)s' % dict(
+                command=command,
+                help=getattr(self, 'do_' + command).__doc__,
+            ) for command in self.command_list
+        ])
 
 
 def main():
