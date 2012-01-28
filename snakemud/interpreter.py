@@ -32,6 +32,10 @@ class Interpreter(object):
         return ("You're slithering on the cold hard stone floor.\n"
                 "The cold doesn't bother you.")
 
+    def do_inventory(self, *args):
+        """examine your inventory"""
+        return ("You're a snake!  You're carrying nothing.")
+
     def do_help(self, *args):
         """print help about available commands"""
         return "\n".join([
