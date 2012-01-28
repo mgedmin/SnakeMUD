@@ -15,8 +15,13 @@
                 term.echo(data.response);
                 term.echo('\n');
                 term.set_command_list(data.command_list);
-            }).error(function() {
-                term.error("Lost connection to server\n\n");
+            }).error(function(e) {
+                if (e.status) {
+                  term.error(e.status + " " + e.statusText);
+                } else {
+                  term.error("Lost connection to server");
+                }
+                term.echo('\n');
             });
         }, {
             greetings: ${greeting|js,n} + '\n\n',
