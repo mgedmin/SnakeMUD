@@ -22,6 +22,9 @@ update:
 clean:
 	find -name '*.pyc' -delete
 
+wipe-sessions:
+	rm -f data/sessions/
+
 bin/pcreate bin/pserve: bin/pip
 	bin/pip install pyramid
 

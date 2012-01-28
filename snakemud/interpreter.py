@@ -79,6 +79,9 @@ class Interpreter(object):
     tail = ()
     length = 7
 
+    def __init__(self):
+        self.do_restart()
+
     @property
     def command_list(self):
         return sorted(name[3:] for name in dir(self) if name.startswith('do_')
@@ -261,6 +264,7 @@ class Interpreter(object):
 
     def do_restart(self, *args):
         """start the game from the very beginning"""
+        self.map = Map()
         self.last_event = None
         self.seen = None
         pos = list(self.map.start_pos)
