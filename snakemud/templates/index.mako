@@ -15,6 +15,8 @@
                 term.echo(data.response);
                 term.echo('\n');
                 term.set_command_list(data.command_list);
+            }).error(function() {
+                term.error("Lost connection to server\n\n");
             });
         }, {
             greetings: ${greeting|js,n} + '\n\n',
@@ -29,6 +31,7 @@
                     term.echo('\n');
                 }
                 term.set_command_list(data.command_list);
+            }).complete(function() {
                 window.setTimeout(event_poll, 1000);
             });
         };
