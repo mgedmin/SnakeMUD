@@ -64,7 +64,6 @@ class Interpreter(object):
         'west': 'west',
     }
 
-    last_poll = None
     last_event = None
     last_command = None
 
@@ -77,23 +76,14 @@ class Interpreter(object):
                       and getattr(self, name).__doc__)
 
     def events(self):
-        try:
-            if self.last_event is None:
-                self.last_event = time.time()
-            if time.time() - self.last_event > 60:
-                if (self.last_command is not None
-                    and self.last_command > self.last_event):
-                    msg = 'You sense the passage of time.'
-                else: # let's not spam too much
-                    self.last_event = self.last_command
-                    msg = ''
-                self.last_event = time.time()
-                return msg
-        finally:
-            self.last_poll = time.time()
+        if self.last_event is None:
+            self.last_event = time.time()
+        elif time.time() - self.last_event > 60:
+            self.last_event = time.time()
+            return 'You sense the passage of time.'
 
     def interpret(self, command):
-        self.last_command = time.time()
+        self.last_event = time.time()
         words = command.split()
         if not words:
             return "Huh?"
