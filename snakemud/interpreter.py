@@ -3,15 +3,29 @@ from functools import partial
 
 class Interpreter(object):
 
-    greeting = "You feel hungry."
-    aliases = {'n': 'go north',
-               's': 'go south',
-               'e': 'go east',
-               'w': 'go west',
-               'north': 'go north',
-               'west': 'go west',
-               'south': 'go south',
-               'east': 'go east'}
+    greeting = "You are hungry."
+
+    aliases = {
+        'n': 'go north',
+        's': 'go south',
+        'e': 'go east',
+        'w': 'go west',
+        'north': 'go north',
+        'west': 'go west',
+        'south': 'go south',
+        'east': 'go east',
+    }
+
+    directions = {
+        'n': (0, -1),
+        's': (0, +1),
+        'e': (+1, 0),
+        'w': (-1, 0),
+        'north': (0, -1),
+        'south': (0, +1),
+        'east': (+1, 0),
+        'west': (-1, 0),
+    }
 
     @property
     def command_list(self):
@@ -24,10 +38,11 @@ class Interpreter(object):
             return "Huh?"
         command = words[0].lower()
         if command in self.aliases:
-            command = self.aliases.get(command)
+            words[:1] = self.aliases.get(command).split()
+            command = words[0].lower()
         fn = getattr(self, 'do_' + command,
                      partial(self.unknown_command, command))
-        return fn(*words)
+        return fn(*words[1:])
 
     def unknown_command(self, command, *args):
         return ("Don't know how to %s, sorry." % command)
@@ -68,6 +83,30 @@ class Interpreter(object):
         """count from one to infinity"""
         self.counter += 1
         return 'The count is now %d' % self.counter
+
+    def do_eat(self, *args):
+        return "You don't have any food!"
+
+    def do_bite(self, *args):
+        return "Bite what?"
+
+    x = y = 0
+
+    def do_go(self, direction, *args):
+        """move in the given direction (n/s/e/w)"""
+        try:
+            dx, dy = self.directions[direction.lower()]
+        except KeyError:
+            return "I don't know where %s is." % direction
+        self.x += dx
+        self.y += dy
+        return "Your GPS reads: %+d, %+d" % (self.x, self.y)
+
+    def do_where(self, *args):
+        return "Your GPS reads: %+d, %+d" % (self.x, self.y)
+
+    def do_gps(self, *args):
+        return "Yeah, I don't know where a snake found a GPS."
 
 
 def main():
