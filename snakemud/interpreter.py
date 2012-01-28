@@ -201,7 +201,16 @@ class Interpreter(object):
 
     def do_bite(self, *args):
         """bite something"""
-        return "Bite what?"
+        if not args:
+            return "Bite what?"
+        what = args[0]
+        if what in ('compass', 'map', 'gps'):
+            return "It is inedible and not threatening."
+        if what == 'tail':
+            for d in 'nsew':
+                if self.look(d) == '*' and self.coords(d) == self.tail[0]:
+                    return 'Ouch!  You found your tail!'
+        return 'I see no %s here.' % what
 
     def do_go(self, *args):
         """move in the given direction (n/s/e/w)"""
