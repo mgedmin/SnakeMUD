@@ -41,7 +41,7 @@ class Interpreter(object):
         try:
             if self.last_event is None:
                 self.last_event = time.time()
-            if time.time() - self.last_event > 10:
+            if time.time() - self.last_event > 60:
                 self.last_event = time.time()
                 return 'You sense the passage of time.'
         finally:
