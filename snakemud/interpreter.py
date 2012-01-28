@@ -141,11 +141,25 @@ class Interpreter(object):
     def do_inventory(self, *args):
         """examine your inventory"""
         return ("You're a snake!  You're carrying nothing.\n"
-                "Except the GPS you, uh, found somewhere.  And a map.  And a pencil.")
+                "Except the GPS you, uh, found somewhere.  And a map.  And a compass.")
 
     def do_take(self, *args):
         """pick something up"""
         return ("There's nothing here to take.")
+
+    def do_examine(self, *args):
+        """examine an object"""
+        if not args:
+            return "Examine what?"
+        what = args[0]
+        if what == 'compass':
+            return self.do_compass()
+        elif what == 'map':
+            return self.do_map()
+        elif what == 'gps':
+            return self.do_gps()
+        else:
+            return "I see no %s here." % what
 
     def do_help(self, *args):
         """print help about available commands"""
