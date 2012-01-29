@@ -721,6 +721,10 @@ class Interpreter(object):
             msg += '\n\n' + self.do_draw()
         return msg
 
+    def do_level(self):
+        """print current game level number"""
+        return "You're playing level %d." % self.level
+
 
 def main():
     import readline
