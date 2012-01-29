@@ -14,7 +14,7 @@ requires = [
     ]
 
 setup(name='SnakeMUD',
-      version='0.0',
+      version='0.1',
       description='SnakeMUD',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -23,9 +23,9 @@ setup(name='SnakeMUD',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
-      author='',
-      author_email='',
-      url='',
+      author='Marius Gedminas',
+      author_email='marius@gedmin.as',
+      url='https://github.com/mgedmin/SnakeMUD',
       keywords='web pyramid pylons',
       packages=find_packages(),
       include_package_data=True,
