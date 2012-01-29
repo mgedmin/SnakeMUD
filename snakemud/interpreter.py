@@ -475,6 +475,17 @@ class Interpreter(object):
             '                ',
             '                ',
         ]
+        north_snake = [
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '       @@       ',
+            '                ',
+            '                ',
+        ]
         east_exit = [
             '                ',
             '                ',
@@ -485,6 +496,17 @@ class Interpreter(object):
             '             || ',
             '             \| ',
             '              \ ',
+        ]
+        east_snake = [
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '             @  ',
+            '             @  ',
+            '                ',
         ]
         west_exit = [
             '                ',
@@ -497,6 +519,28 @@ class Interpreter(object):
             ' |/             ',
             ' /              ',
         ]
+        west_snake = [
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '  @             ',
+            '  @             ',
+            '                ',
+        ]
+        room_snake = [
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '     @ @@ @     ',
+            '    @  @@  @    ',
+            '                ',
+        ]
         south_exit = [
             '                ',
             '   _--------_   ',
@@ -508,18 +552,39 @@ class Interpreter(object):
             ' |            | ',
             ' |____________| ',
         ]
+        south_snake = [
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '                ',
+            '   @  @  @  @   ',
+        ]
         def overlay_image(back, front):
             return [''.join(fc if fc != ' ' else bc
                             for fc, bc in zip(frow, brow))
                     for frow, brow in zip(front, back)]
         if self.look('n') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, north_exit)
+        if self.look('n') in (BODY, TAIL):
+            room = overlay_image(room, north_snake)
         if self.look('e') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, east_exit)
+        if self.look('e') in (BODY, TAIL):
+            room = overlay_image(room, east_snake)
         if self.look('w') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, west_exit)
+        if self.look('w') in (BODY, TAIL):
+            room = overlay_image(room, west_snake)
+        # The player is always in the middle of the room
+        room = overlay_image(room, room_snake)
         if self.look('s') in (FLOOR, BODY, TAIL):
             room = overlay_image(room, south_exit)
+        if self.look('s') in (BODY, TAIL):
+            room = overlay_image(room, south_snake)
         return '\n'.join(room)
 
     def side_by_side(self, left, right, padding=4):
