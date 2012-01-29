@@ -382,7 +382,6 @@ class Interpreter(object):
         self.map = Map(level=self.level)
         self.length = self.map.start_length
         self.last_event = None
-        self.seen = None
         self.tail = ()
         pos = list(self.map.start_pos)
         random.shuffle(pos)
@@ -390,8 +389,9 @@ class Interpreter(object):
             if self.map[self.x, self.y] == FLOOR:
                 break
         self.map[self.x, self.y] = HEAD
-        self.mark_seen(self.x, self.y)
         self.do_explore(self.length)
+        self.seen = None
+        self.mark_seen(self.x, self.y)
         msg = '\n\n\n\n\n' + self.greeting
         return msg + self.auto_things()
 
