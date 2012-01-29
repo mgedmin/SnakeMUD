@@ -637,7 +637,8 @@ class Interpreter(object):
             room = overlay_image(room, south_snake)
         elif self.look('s') == TAIL:
             room = overlay_image(room, south_tail)
-        return '\n'.join(room)
+        return '\n'.join(room).replace('@', '[[;#a84;]@]')\
+                              .replace(',', '[[;#a84;],]')
 
     def side_by_side(self, left, right, padding=4):
         if not left:
