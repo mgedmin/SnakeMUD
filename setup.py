@@ -14,7 +14,7 @@ requires = [
     ]
 
 setup(name='SnakeMUD',
-      version='0.1',
+      version='0.2dev',
       description='SnakeMUD',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
