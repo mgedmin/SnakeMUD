@@ -317,7 +317,7 @@ class Interpreter(object):
             msg = self.describe_exits()
             if not msg:
                 msg = "You somehow ended up in a room with no exits!?!?!"
-            surroundings = self.describe_surroundings(False)
+            surroundings = self.describe_surroundings()
             if surroundings:
                 msg += '\n' + surroundings
             return msg + self.auto_things()
