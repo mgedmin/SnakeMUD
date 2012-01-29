@@ -246,7 +246,9 @@ class Interpreter(object):
 
     def do_eat(self, *args):
         """eat something"""
-        return "You don't have any food!"
+        if not args:
+            return "You don't have any food!"
+        return self.do_bite(*args)
 
     def do_bite(self, *args):
         """bite something"""
@@ -257,7 +259,12 @@ class Interpreter(object):
             return "It is inedible and not threatening."
         if what in ('tail', 'snake'):
             if self.adjacent_to(self.tail[0]):
-                return 'Ouch!  You found your tail!'
+                if self.map.has_level(self.level + 1):
+                    return ("Ouch!  You found your tail!\n\n" +
+                            "You win!  Type 'restart %d' to play the next level." % (self.level + 1))
+                else:
+                    return ("Ouch!  You found your tail!\n\n" +
+                            "You win the game!  Type 'restart 1' to play again.")
         if what in ('body', 'snake'):
             for d in 'nsew':
                 if self.look(d) == BODY and self.coords(d) not in self.tail:
@@ -265,7 +272,7 @@ class Interpreter(object):
             for d in 'nsew':
                 if self.coords(d) in self.tail:
                     return 'Ouch!'
-        if what == ('tail', 'snake'):
+        if what in ('tail', 'snake'):
             if self.can_see(TAIL):
                 return 'You bite some snake.'
         return 'I see no %s here.' % what
