@@ -147,8 +147,8 @@ class Interpreter(object):
         if exits:
             description += '\n\n' + exits
         for d in 'nsew':
-            if self.look(d) == BODY:
-                if self.coords(d) == self.tail[0]:
+            if self.look(d) in (BODY, TAIL):
+                if self.coords(d) == self.tail[0] or self.look(d) != BODY:
                     description += '\n\nYou see a snake tail in the %s!  Is that your tail?' % self.full_direction[d]
                 elif self.coords(d) == self.tail[-1]:
                     description += '\n\nYour body fills the cavern to the %s.' % self.full_direction[d]
@@ -351,11 +351,9 @@ class Interpreter(object):
         self.length = self.map.start_length
         self.last_event = None
         self.seen = None
+        self.tail = ()
         pos = list(self.map.start_pos)
         random.shuffle(pos)
-        for x, y in self.tail:
-            self.map[x, y] = FLOOR
-        self.tail = ()
         for self.x, self.y in pos:
             if self.map[self.x, self.y] == FLOOR:
                 break
