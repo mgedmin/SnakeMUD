@@ -96,6 +96,7 @@ class Interpreter(object):
     seen = None
     tail = ()
     length = 11
+    found_tail = False
 
     def __init__(self):
         self.do_restart()
@@ -259,11 +260,15 @@ class Interpreter(object):
             return "It is inedible and not threatening."
         if what in ('tail', 'snake'):
             if self.adjacent_to(self.tail[0]):
+                msg = "Ouch!"
+                if not self.found_tail:
+                    self.found_tail = True
+                    msg += "  You found your tail!"
                 if self.map.has_level(self.level + 1):
-                    return ("Ouch!  You found your tail!\n\n" +
+                    return (msg + "\n\n" +
                             "You win!  Type 'restart %d' to play the next level." % (self.level + 1))
                 else:
-                    return ("Ouch!  You found your tail!\n\n" +
+                    return (msg + "\n\n" +
                             "You win the game!  Type 'restart 1' to play again.")
         if what in ('body', 'snake'):
             for d in 'nsew':
@@ -308,8 +313,11 @@ class Interpreter(object):
         elif what == WALL:
             return "There's a wall blocking your way."
         elif what == TAIL and self.coords(direction) == self.tail[0]:
-            return "You found your tail! Your mouth waters."
-            # gently suggest biting it
+            if self.found_tail:
+                return "You found your tail! Try biting it."
+            else:
+                self.found_tail = True
+                return "You found your tail! Your mouth waters."
         elif what == BODY and self.coords(direction) in self.tail:
             return "Your body blocks the way."
         elif what == BODY:
@@ -382,6 +390,7 @@ class Interpreter(object):
         self.map = Map(level=self.level)
         self.length = self.map.start_length
         self.last_event = None
+        self.found_tail = None
         self.tail = ()
         pos = list(self.map.start_pos)
         random.shuffle(pos)
