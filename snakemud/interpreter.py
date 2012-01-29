@@ -418,7 +418,11 @@ class Interpreter(object):
         xs = [x for (x, y) in self.seen]
         ys = [y for (x, y) in self.seen]
         xmin, xmax = min(xs), max(xs)
+        xmin = max(xmin, self.x - 15)
+        xmax = min(xmax, self.x + 15)
         ymin, ymax = min(ys), max(ys)
+        ymin = max(ymin, self.y - 15)
+        ymax = min(ymax, self.y + 15)
         rows = []
         for y in range(ymin, ymax + 1):
             row = ['[[;#a84;]%s]' % self.map[x, y]
@@ -428,7 +432,13 @@ class Interpreter(object):
                    else ' '
                    for x in range(xmin, xmax + 1)]
             rows.append(' '.join(row))
-        return '\n'.join(rows)
+        map = '\n'.join(rows)
+        while True:
+            s = re.sub(r'(\[\[;#a84;][^]]*)] \[\[;#a84;]([^]]*])', r'\1 \2', map)
+            if s == map:
+                break
+            map = s
+        return map
 
     def do_undocumented(self, *args):
         return "\n".join([
