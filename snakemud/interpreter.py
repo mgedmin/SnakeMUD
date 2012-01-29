@@ -29,6 +29,9 @@ class Map(object):
         if not self.start_pos:
             self.start_pos.append((1, 1))
 
+    def has_level(self, level):
+        return pkg_resources.resource_exists('snakemud', 'maps/l%d.txt' % level)
+
     def __getitem__(self, (x, y)):
         if not 0 <= y < len(self.data) or not 0 <= x < len(self.data[y]):
             return WALL
@@ -218,7 +221,20 @@ class Interpreter(object):
             return "I see no %s here." % what
 
     def do_help(self, *args):
-        """print help about available commands"""
+        """print a brief help message"""
+        return ("You're a long snake crawling through a dungeon.\n"
+                "\n"
+                "Type commands like 'look' to see what you can see around you,\n"
+                "or commands like 'go north' to move around (short versions\n"
+                "'n', 's', 'e', 'w' also work).\n"
+                "\n"
+                "Type 'commands' to see a list of (almost all) available commands.\n"
+                "\n"
+                "Your goal is to find your tail and bite it.  It may be easier\n"
+                "to achieve this goal if you use 'draw on' and/or 'map on'.")
+
+    def do_commands(self, *args):
+        """list available commands"""
         return "\n".join([
             "Commands:",
         ] + [
@@ -324,9 +340,11 @@ class Interpreter(object):
             return False
 
     def do_gps(self, *args):
+        """look at your GPS"""
         return "Your GPS reads: %+d, %+d" % (self.x, self.y)
 
     def do_compass(self, *args):
+        """look at your compass"""
         if args:
             if args[0] == 'on':
                 return 'The compass always points north, which is up.'
@@ -345,8 +363,15 @@ class Interpreter(object):
 
     def do_restart(self, *args):
         """start the game from the very beginning"""
+        level = self.level
         if args:
-            self.level = int(args[0])
+            try:
+                level = int(args[0])
+            except ValueError:
+                return "That's not a level number."
+            if not self.map.has_level(level):
+                return "There is no level %d." % level
+            self.level = level
         self.map = Map(level=self.level)
         self.length = self.map.start_length
         self.last_event = None
@@ -371,6 +396,7 @@ class Interpreter(object):
                 self.seen.add((ax, ay))
 
     def do_map(self, *args):
+        """draw the map of cavern's you've seen"""
         if not self.seen:
             self.mark_seen(self.x, self.y)
         if args:
@@ -424,6 +450,7 @@ class Interpreter(object):
             return None
 
     def do_explore(self, *args):
+        """move randomly towards unseen locations for N turns"""
         if args:
             try:
                 n = int(args[0])
@@ -444,6 +471,7 @@ class Interpreter(object):
             return '\n'.join(res)
 
     def do_draw(self, *args):
+        """artistically draw the cavern you're in"""
         if args:
             if args[0] == 'on':
                 self.auto_draw = True
