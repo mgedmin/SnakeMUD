@@ -147,12 +147,6 @@ class Interpreter(object):
         """examine your surroundings"""
         description = ("You're slithering on the cold hard stone floor.\n"
                        "The cold doesn't bother you.")
-        exits = self.describe_exits()
-        if exits:
-            description += '\n\n' + exits
-        surroundings = self.describe_surroundings()
-        if surroundings:
-            description += '\n\n' + surroundings
         return description + self.auto_things()
 
     def describe_surroundings(self, mention_self=True):
@@ -314,13 +308,8 @@ class Interpreter(object):
             self.y += dy
             self.mark_seen(self.x, self.y)
             self.map[self.x, self.y] = HEAD
-            msg = self.describe_exits()
-            if not msg:
-                msg = "You somehow ended up in a room with no exits!?!?!"
-            surroundings = self.describe_surroundings()
-            if surroundings:
-                msg += '\n' + surroundings
-            return msg + self.auto_things()
+            return ("You go %s." % self.full_direction[direction]
+                    + self.auto_things())
         elif what == WALL:
             return "There's a wall blocking your way."
         elif what == TAIL and self.coords(direction) == self.tail[0]:
@@ -500,8 +489,7 @@ class Interpreter(object):
             d = self.pick_direction()
             if not d:
                 break
-            res.append('You go %s.  %s' % (self.full_direction[d],
-                                           self.do_go(d)))
+            res.append(self.do_go(d))
         if not res:
             return 'I agree, you should do some exploring.'
         else:
@@ -723,6 +711,12 @@ class Interpreter(object):
 
     def auto_things(self):
         msg = ''
+        exits = self.describe_exits()
+        if exits:
+            msg += '\n\n' + exits
+        surroundings = self.describe_surroundings()
+        if surroundings:
+            msg += '\n\n' + surroundings
         if self.auto_map and self.auto_draw:
             msg += '\n\n' + self.side_by_side(self.do_draw(),
                                               '\n' + self.do_map())
