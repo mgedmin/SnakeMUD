@@ -150,17 +150,25 @@ class Interpreter(object):
         exits = self.describe_exits()
         if exits:
             description += '\n\n' + exits
+        surroundings = self.describe_surroundings()
+        if surroundings:
+            description += '\n\n' + surroundings
+        return description + self.auto_things()
+
+    def describe_surroundings(self, mention_self=True):
+        description = ''
         for d in 'nsew':
             if self.look(d) in (BODY, TAIL):
                 if self.coords(d) == self.tail[0] or self.look(d) != BODY:
                     description += '\n\nYou see a snake tail in the %s!  Is that your tail?' % self.full_direction[d]
                 elif self.coords(d) == self.tail[-1]:
-                    description += '\n\nYour body fills the cavern to the %s.' % self.full_direction[d]
+                    if mention_self:
+                        description += '\n\nYour body fills the cavern to the %s.' % self.full_direction[d]
                 else:
                     description += '\n\nYou see a snake body in the %s.' % self.full_direction[d]
-        return description + self.auto_things()
+        return description.lstrip()
 
-    def describe_exits(self, original_direction=None):
+    def describe_exits(self):
         exit_color = '#66f'
         exits = [direction for direction in ['north', 'south', 'east', 'west']
                  if self.look(direction) in (FLOOR, BODY, TAIL)]
@@ -306,9 +314,12 @@ class Interpreter(object):
             self.y += dy
             self.mark_seen(self.x, self.y)
             self.map[self.x, self.y] = HEAD
-            msg = self.describe_exits(direction)
+            msg = self.describe_exits()
             if not msg:
                 msg = "You somehow ended up in a room with no exits!?!?!"
+            surroundings = self.describe_surroundings(False)
+            if surroundings:
+                msg += '\n' + surroundings
             return msg + self.auto_things()
         elif what == WALL:
             return "There's a wall blocking your way."
@@ -721,8 +732,10 @@ class Interpreter(object):
             msg += '\n\n' + self.do_draw()
         return msg
 
-    def do_level(self):
+    def do_level(self, *args):
         """print current game level number"""
+        if args:
+            return "If you want to play a different level, use 'restart %s' instead." % args[0]
         return "You're playing level %d." % self.level
 
 
