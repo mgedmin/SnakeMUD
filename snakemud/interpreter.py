@@ -7,7 +7,7 @@ from functools import partial
 FLOOR = '.'
 HEAD = '@'
 BODY = '*'
-TAIL = '*'
+TAIL = ','
 WALL = '#'
 
 
@@ -18,6 +18,7 @@ class Map(object):
 
     def __init__(self, level=1):
         self.data = pkg_resources.resource_string('snakemud', 'maps/l%d.txt' % level).splitlines()
+        self.start_length = int(self.data.pop())
         self.start_pos = []
         for y in range(len(self.data)):
             self.data[y] = list(self.data[y])
@@ -344,7 +345,10 @@ class Interpreter(object):
 
     def do_restart(self, *args):
         """start the game from the very beginning"""
+        if args:
+            self.level = int(args[0])
         self.map = Map(level=self.level)
+        self.length = self.map.start_length
         self.last_event = None
         self.seen = None
         pos = list(self.map.start_pos)
@@ -386,9 +390,9 @@ class Interpreter(object):
         ymin, ymax = min(ys), max(ys)
         rows = []
         for y in range(ymin, ymax + 1):
-            row = ['[[;#a84;]@]' if (x, y) == (self.x, self.y)
-                   else '[[;#a84;]*]' if (x, y) in self.tail
-                                         and (x, y) in self.seen
+            row = ['[[;#a84;]%s]' % self.map[x, y]
+                        if (x, y) == (self.x, self.y) or
+                           (x, y) in self.tail and (x, y) in self.seen
                    else self.map[x, y] if (x, y) in self.seen
                    else ' '
                    for x in range(xmin, xmax + 1)]
