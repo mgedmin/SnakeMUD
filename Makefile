@@ -32,4 +32,4 @@ bin/python bin/pip:
 	virtualenv --no-site-packages .
 
 lib/python*/site-packages/SnakeMUD.egg-link: bin/python setup.py
-	bin/python setup.py develop
+	bin/pip install -e .
