@@ -4,7 +4,7 @@ MarkupSafe==0.15
 PasteDeploy==1.5.0
 Pygments==2.7.4
 -e git+git@github.com:mgedmin/SnakeMUD.git@5760bf2a53e3441c8b43562100b8d901505a5ac8#egg=SnakeMUD-dev
-WebOb==1.2b2
+WebOb==1.6.0a0
 distribute==0.6.19
 pyramid==1.3a6
 pyramid-debugtoolbar==0.9.8
